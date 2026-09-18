@@ -154,7 +154,7 @@
             font-size: 13px;
         }
 
-        /* ========== HEADER ========== */
+        /* ========== HEADER ==========++++ */
         header {
             position: sticky;
             top: 0;

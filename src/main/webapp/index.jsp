@@ -1,391 +1,744 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TaskFlow App</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KYC Transaction Audit</title>
 
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: "Segoe UI", Arial, sans-serif;
-    }
+    <style>
+        * {
+            box-sizing: border-box;
+        }
 
-    body {
-      background: #f5f7fb;
-      color: #222;
-    }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            color: #222;
+        }
 
-    .app {
-      display: flex;
-      min-height: 100vh;
-    }
+        header {
+            background: #172b4d;
+            color: white;
+            padding: 20px 30px;
+        }
 
-    /* Sidebar */
-    .sidebar {
-      width: 240px;
-      background: #111827;
-      color: white;
-      padding: 25px 15px;
-      position: fixed;
-      height: 100vh;
-    }
+        header h1 {
+            margin: 0;
+        }
 
-    .logo {
-      font-size: 24px;
-      font-weight: bold;
-      text-align: center;
-      margin-bottom: 35px;
-    }
+        header p {
+            margin: 6px 0 0;
+            color: #cbd5e1;
+        }
 
-    .logo span {
-      color: #6366f1;
-    }
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
 
-    .menu a {
-      display: block;
-      color: #cbd5e1;
-      text-decoration: none;
-      padding: 14px 15px;
-      margin: 5px 0;
-      border-radius: 8px;
-      transition: 0.3s;
-    }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
 
-    .menu a:hover,
-    .menu a.active {
-      background: #4f46e5;
-      color: white;
-    }
+        .filters {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: end;
+        }
 
-    /* Main */
-    .main {
-      margin-left: 240px;
-      width: calc(100% - 240px);
-      padding: 30px;
-    }
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
 
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-      gap: 20px;
-    }
+        label {
+            font-weight: bold;
+            font-size: 14px;
+        }
 
-    .topbar h1 {
-      font-size: 28px;
-    }
+        input, select {
+            padding: 10px;
+            border: 1px solid #ccd3dc;
+            border-radius: 5px;
+        }
 
-    .search {
-      padding: 12px 16px;
-      width: 250px;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      outline: none;
-    }
+        button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
 
-    /* Cards */
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-      margin-bottom: 30px;
-    }
+        .primary {
+            background: #2563eb;
+            color: white;
+        }
 
-    .card {
-      background: white;
-      padding: 25px;
-      border-radius: 15px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.06);
-    }
+        .secondary {
+            background: #64748b;
+            color: white;
+        }
 
-    .card h3 {
-      color: #64748b;
-      font-size: 15px;
-      margin-bottom: 10px;
-    }
+        .success {
+            background: #16a34a;
+            color: white;
+        }
 
-    .card p {
-      font-size: 30px;
-      font-weight: bold;
-    }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
 
-    .blue {
-      border-left: 5px solid #6366f1;
-    }
+        th {
+            background: #172b4d;
+            color: white;
+            text-align: left;
+            padding: 12px;
+        }
 
-    .green {
-      border-left: 5px solid #22c55e;
-    }
+        td {
+            padding: 11px;
+            border-bottom: 1px solid #e5e7eb;
+        }
 
-    .orange {
-      border-left: 5px solid #f97316;
-    }
+        tr:hover {
+            background: #f8fafc;
+        }
 
-    /* Tasks */
-    .task-section {
-      background: white;
-      padding: 25px;
-      border-radius: 15px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.06);
-    }
+        .pass {
+            color: #15803d;
+            font-weight: bold;
+        }
 
-    .task-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
+        .fail {
+            color: #dc2626;
+            font-weight: bold;
+        }
 
-    .add-btn {
-      background: #4f46e5;
-      color: white;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
+        .pending {
+            color: #d97706;
+            font-weight: bold;
+        }
 
-    .add-btn:hover {
-      background: #3730a3;
-    }
+        .summary {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
 
-    .task {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px;
-      border-bottom: 1px solid #eee;
-    }
+        .summary-box {
+            flex: 1;
+            min-width: 180px;
+            padding: 18px;
+            border-radius: 7px;
+            background: #f8fafc;
+            border-left: 5px solid #2563eb;
+        }
 
-    .task:last-child {
-      border-bottom: none;
-    }
+        .summary-box h3 {
+            margin: 0;
+            font-size: 14px;
+            color: #64748b;
+        }
 
-    .task-info h4 {
-      margin-bottom: 5px;
-    }
+        .summary-box p {
+            margin: 8px 0 0;
+            font-size: 25px;
+            font-weight: bold;
+        }
 
-    .task-info p {
-      color: #64748b;
-      font-size: 13px;
-    }
+        .empty {
+            text-align: center;
+            padding: 30px;
+            color: #64748b;
+        }
 
-    .status {
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      background: #dcfce7;
-      color: #15803d;
-    }
+        @media (max-width: 800px) {
+            table {
+                font-size: 12px;
+            }
 
-    /* Mobile */
-    @media (max-width: 800px) {
-
-      .sidebar {
-        width: 70px;
-        padding: 20px 8px;
-      }
-
-      .logo {
-        font-size: 18px;
-      }
-
-      .menu a {
-        text-align: center;
-        font-size: 0;
-      }
-
-      .menu a::first-letter {
-        font-size: 20px;
-      }
-
-      .main {
-        margin-left: 70px;
-        width: calc(100% - 70px);
-        padding: 20px;
-      }
-
-      .cards {
-        grid-template-columns: 1fr;
-      }
-
-      .topbar {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .search {
-        width: 100%;
-      }
-    }
-  </style>
+            th, td {
+                padding: 7px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-  <div class="app">
+<header>
+    <h1>KYC Transaction Audit</h1>
+    <p>Verify KYC completion before transaction processing</p>
+</header>
 
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="logo">
-        Task<span>Flow</span>
-      </div>
+<div class="container">
 
-      <nav class="menu">
-        <a href="#" class="active">🏠 Dashboard</a>
-        <a href="#">📋 Tasks</a>
-        <a href="#">📊 Reports</a>
-        <a href="#">👥 Team</a>
-        <a href="#">⚙️ Settings</a>
-      </nav>
-    </aside>
+    <!-- Filters -->
+    <div class="card">
 
-    <!-- Main Content -->
-    <main class="main">
+        <h2>Audit Filters</h2>
 
-      <div class="topbar">
-        <div>
-          <h1>Dashboard</h1>
-          <p>Welcome back! Here's what's happening today.</p>
-        </div>
+        <div class="filters">
 
-        <input
-          class="search"
-          type="text"
-          placeholder="🔍 Search tasks..."
-          id="searchBox"
-        >
-      </div>
-
-      <!-- Statistics -->
-      <div class="cards">
-
-        <div class="card blue">
-          <h3>Total Tasks</h3>
-          <p id="totalTasks">12</p>
-        </div>
-
-        <div class="card green">
-          <h3>Completed</h3>
-          <p id="completedTasks">8</p>
-        </div>
-
-        <div class="card orange">
-          <h3>Pending</h3>
-          <p id="pendingTasks">4</p>
-        </div>
-
-      </div>
-
-      <!-- Task List -->
-      <section class="task-section">
-
-        <div class="task-header">
-          <h2>Recent Tasks</h2>
-          <button class="add-btn" onclick="addTask()">
-            + Add Task
-          </button>
-        </div>
-
-        <div id="taskList">
-
-          <div class="task">
-            <div class="task-info">
-              <h4>Design Homepage</h4>
-              <p>Due today</p>
+            <div class="field">
+                <label for="userId">User ID</label>
+                <input
+                    type="text"
+                    id="userId"
+                    placeholder="e.g. U001">
             </div>
-            <span class="status">Completed</span>
-          </div>
 
-          <div class="task">
-            <div class="task-info">
-              <h4>Update Database</h4>
-              <p>Due tomorrow</p>
+            <div class="field">
+                <label for="role">Role</label>
+                <select id="role">
+                    <option value="ALL">All</option>
+                    <option value="PAYER">Payer</option>
+                    <option value="PAYEE">Payee</option>
+                </select>
             </div>
-            <span class="status">Completed</span>
-          </div>
 
-          <div class="task">
-            <div class="task-info">
-              <h4>Create Marketing Plan</h4>
-              <p>Due Friday</p>
+            <div class="field">
+                <label for="result">Result</label>
+                <select id="result">
+                    <option value="ALL">All</option>
+                    <option value="PASS">Pass</option>
+                    <option value="FAIL">Fail</option>
+                </select>
             </div>
-            <span class="status"
-              style="background:#ffedd5;color:#c2410c;">
-              Pending
-            </span>
-          </div>
+
+            <button class="primary" onclick="runAudit()">
+                Run Audit
+            </button>
+
+            <button class="secondary" onclick="resetAudit()">
+                Reset
+            </button>
+
+            <button class="success" onclick="exportCSV()">
+                Export CSV
+            </button>
 
         </div>
 
-      </section>
+    </div>
 
-    </main>
-  </div>
+    <!-- Summary -->
+    <div class="card">
 
-  <script>
+        <h2>Audit Summary</h2>
 
-    function addTask() {
+        <div class="summary">
 
-      let taskName = prompt("Enter your task name:");
+            <div class="summary-box">
+                <h3>Total Records</h3>
+                <p id="totalRecords">0</p>
+            </div>
 
-      if (taskName && taskName.trim() !== "") {
+            <div class="summary-box">
+                <h3>Passed</h3>
+                <p id="passedRecords">0</p>
+            </div>
 
-        const taskList = document.getElementById("taskList");
+            <div class="summary-box">
+                <h3>Failed</h3>
+                <p id="failedRecords">0</p>
+            </div>
 
-        const task = document.createElement("div");
+            <div class="summary-box">
+                <h3>Distinct Users</h3>
+                <p id="distinctUsers">0</p>
+            </div>
 
-        task.className = "task";
+        </div>
 
-        task.innerHTML = `
-          <div class="task-info">
-            <h4>${taskName}</h4>
-            <p>New task</p>
-          </div>
+    </div>
 
-          <span class="status"
-            style="background:#ffedd5;color:#c2410c;">
-            Pending
-          </span>
-        `;
+    <!-- Results -->
+    <div class="card">
 
-        taskList.appendChild(task);
+        <h2>Audit Results</h2>
 
-        updateTaskCount();
-      }
+        <table>
+
+            <thead>
+            <tr>
+                <th>Transaction ID</th>
+                <th>User ID</th>
+                <th>Role</th>
+                <th>KYC Date</th>
+                <th>Transaction Date</th>
+                <th>KYC Status</th>
+                <th>Result</th>
+            </tr>
+            </thead>
+
+            <tbody id="resultTable">
+            </tbody>
+
+        </table>
+
+        <div id="emptyMessage" class="empty">
+            Click "Run Audit" to generate the audit report.
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    /*
+     * Sample KYC data
+     */
+    const kycData = [
+        {
+            userId: "U001",
+            kycDate: "2026-09-01T10:00:00",
+            status: "VERIFIED"
+        },
+        {
+            userId: "U002",
+            kycDate: "2026-09-02T11:00:00",
+            status: "VERIFIED"
+        },
+        {
+            userId: "U003",
+            kycDate: "2026-09-10T12:00:00",
+            status: "VERIFIED"
+        },
+        {
+            userId: "U004",
+            kycDate: "2026-09-20T12:00:00",
+            status: "PENDING"
+        }
+    ];
+
+
+    /*
+     * Sample transaction data
+     */
+    const transactions = [
+        {
+            id: "T001",
+            payer: "U001",
+            payee: "U002",
+            date: "2026-09-05T10:00:00"
+        },
+        {
+            id: "T002",
+            payer: "U002",
+            payee: "U003",
+            date: "2026-09-11T10:00:00"
+        },
+        {
+            id: "T003",
+            payer: "U003",
+            payee: "U001",
+            date: "2026-09-12T15:00:00"
+        },
+        {
+            id: "T004",
+            payer: "U004",
+            payee: "U001",
+            date: "2026-09-21T10:00:00"
+        }
+    ];
+
+
+    let auditResults = [];
+
+
+    /*
+     * Find KYC record for user
+     */
+    function findKyc(userId) {
+
+        return kycData.find(
+            kyc => kyc.userId === userId
+        );
+
     }
 
-    function updateTaskCount() {
 
-      const tasks =
-        document.querySelectorAll(".task").length;
+    /*
+     * Main audit function
+     */
+    function runAudit() {
 
-      document.getElementById("totalTasks").textContent = tasks;
-    }
+        const userFilter =
+            document.getElementById("userId")
+                .value
+                .trim()
+                .toUpperCase();
 
-    // Search tasks
-    document
-      .getElementById("searchBox")
-      .addEventListener("input", function() {
+        const roleFilter =
+            document.getElementById("role").value;
 
-        const search = this.value.toLowerCase();
+        const resultFilter =
+            document.getElementById("result").value;
 
-        document.querySelectorAll(".task").forEach(task => {
 
-          const text = task.textContent.toLowerCase();
+        auditResults = [];
 
-          task.style.display =
-            text.includes(search) ? "flex" : "none";
+
+        /*
+         * Convert every transaction into
+         * two audit records:
+         *
+         * PAYER
+         * PAYEE
+         */
+        transactions.forEach(transaction => {
+
+            const users = [
+
+                {
+                    userId: transaction.payer,
+                    role: "PAYER"
+                },
+
+                {
+                    userId: transaction.payee,
+                    role: "PAYEE"
+                }
+
+            ];
+
+
+            users.forEach(user => {
+
+                const kyc = findKyc(user.userId);
+
+
+                let result = "FAIL";
+
+
+                if (
+                    kyc &&
+                    kyc.status === "VERIFIED" &&
+                    new Date(kyc.kycDate)
+                        < new Date(transaction.date)
+                ) {
+
+                    result = "PASS";
+
+                }
+
+
+                auditResults.push({
+
+                    transactionId: transaction.id,
+
+                    userId: user.userId,
+
+                    role: user.role,
+
+                    kycDate:
+                        kyc
+                            ? kyc.kycDate
+                            : null,
+
+                    transactionDate:
+                        transaction.date,
+
+                    kycStatus:
+                        kyc
+                            ? kyc.status
+                            : "NOT FOUND",
+
+                    result: result
+
+                });
+
+            });
 
         });
 
-      });
 
-  </script>
+        /*
+         * Apply filters
+         */
+        auditResults = auditResults.filter(row => {
+
+            const matchesUser =
+                !userFilter ||
+                row.userId === userFilter;
+
+            const matchesRole =
+                roleFilter === "ALL" ||
+                row.role === roleFilter;
+
+            const matchesResult =
+                resultFilter === "ALL" ||
+                row.result === resultFilter;
+
+            return (
+                matchesUser &&
+                matchesRole &&
+                matchesResult
+            );
+
+        });
+
+
+        displayResults();
+
+    }
+
+
+    /*
+     * Display audit results
+     */
+    function displayResults() {
+
+        const table =
+            document.getElementById("resultTable");
+
+        const empty =
+            document.getElementById("emptyMessage");
+
+
+        table.innerHTML = "";
+
+
+        if (auditResults.length === 0) {
+
+            empty.style.display = "block";
+
+        } else {
+
+            empty.style.display = "none";
+
+        }
+
+
+        auditResults.forEach(row => {
+
+            const tr =
+                document.createElement("tr");
+
+
+            const resultClass =
+                row.result === "PASS"
+                    ? "pass"
+                    : "fail";
+
+
+            tr.innerHTML = `
+
+                <td>${row.transactionId}</td>
+
+                <td>${row.userId}</td>
+
+                <td>${row.role}</td>
+
+                <td>
+                    ${formatDate(row.kycDate)}
+                </td>
+
+                <td>
+                    ${formatDate(row.transactionDate)}
+                </td>
+
+                <td>
+                    ${row.kycStatus}
+                </td>
+
+                <td class="${resultClass}">
+                    ${row.result}
+                </td>
+
+            `;
+
+
+            table.appendChild(tr);
+
+        });
+
+
+        updateSummary();
+
+    }
+
+
+    /*
+     * Update summary boxes
+     */
+    function updateSummary() {
+
+        const total =
+            auditResults.length;
+
+
+        const passed =
+            auditResults.filter(
+                x => x.result === "PASS"
+            ).length;
+
+
+        const failed =
+            auditResults.filter(
+                x => x.result === "FAIL"
+            ).length;
+
+
+        const users =
+            new Set(
+                auditResults.map(
+                    x => x.userId
+                )
+            );
+
+
+        document.getElementById(
+            "totalRecords"
+        ).textContent = total;
+
+
+        document.getElementById(
+            "passedRecords"
+        ).textContent = passed;
+
+
+        document.getElementById(
+            "failedRecords"
+        ).textContent = failed;
+
+
+        document.getElementById(
+            "distinctUsers"
+        ).textContent = users.size;
+
+    }
+
+
+    /*
+     * Format date
+     */
+    function formatDate(date) {
+
+        if (!date) {
+            return "-";
+        }
+
+        return new Date(date)
+            .toLocaleString();
+
+    }
+
+
+    /*
+     * Reset filters and results
+     */
+    function resetAudit() {
+
+        document.getElementById(
+            "userId"
+        ).value = "";
+
+        document.getElementById(
+            "role"
+        ).value = "ALL";
+
+        document.getElementById(
+            "result"
+        ).value = "ALL";
+
+
+        auditResults = [];
+
+        document.getElementById(
+            "resultTable"
+        ).innerHTML = "";
+
+
+        document.getElementById(
+            "emptyMessage"
+        ).style.display = "block";
+
+
+        updateSummary();
+
+    }
+
+
+    /*
+     * Export results as CSV
+     */
+    function exportCSV() {
+
+        if (auditResults.length === 0) {
+
+            alert(
+                "Please run the audit first."
+            );
+
+            return;
+        }
+
+
+        let csv =
+            "Transaction ID,User ID,Role,KYC Date,Transaction Date,KYC Status,Result\n";
+
+
+        auditResults.forEach(row => {
+
+            csv += [
+
+                row.transactionId,
+                row.userId,
+                row.role,
+                row.kycDate || "",
+                row.transactionDate,
+                row.kycStatus,
+                row.result
+
+            ].join(",") + "\n";
+
+        });
+
+
+        const blob =
+            new Blob(
+                [csv],
+                { type: "text/csv" }
+            );
+
+
+        const url =
+            URL.createObjectURL(blob);
+
+
+        const link =
+            document.createElement("a");
+
+
+        link.href = url;
+
+        link.download =
+            "kyc-audit-report.csv";
+
+
+        link.click();
+
+
+        URL.revokeObjectURL(url);
+
+    }
+
+</script>
 
 </body>
 </html>
